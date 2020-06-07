@@ -32,6 +32,13 @@ function serve_asset(req::HTTP.Request)
     assetresponse(filepath)
 end
 
+function serve_dist(req::HTTP.Request)
+    reqURI = req.target |> HTTP.URIs.unescapeuri |> HTTP.URI
+    
+    filepath = joinpath(PKG_ROOT_DIR, relpath(reqURI.path, "/"))
+    assetresponse(filepath)
+end
+
 const PLUTOROUTER = HTTP.Router()
 
 function notebook_redirect(notebook)
@@ -114,6 +121,7 @@ HTTP.@register(PLUTOROUTER, "GET", "/sample/*", serve_sample)
 
 HTTP.@register(PLUTOROUTER, "GET", "/favicon.ico", serve_onefile(joinpath(PKG_ROOT_DIR, "assets", "img", "favicon.ico")))
 HTTP.@register(PLUTOROUTER, "GET", "/assets/*", serve_asset)
+HTTP.@register(PLUTOROUTER, "GET", "/dist/*", serve_dist)
 
 HTTP.@register(PLUTOROUTER, "GET", "/ping", r->HTTP.Response(200, JSON.json("OK!")))
 HTTP.@register(PLUTOROUTER, "GET", "/statistics-info", serve_onefile(joinpath(PKG_ROOT_DIR, "assets", "statistics-info.html")))

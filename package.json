@@ -1,0 +1,27 @@
+{
+  "name": "pluto.jl",
+  "version": "1.0.0",
+  "description": "<h1><img alt=\"Pluto.jl\" src=\"https://raw.githubusercontent.com/fonsp/Pluto.jl/master/assets/img/logo.svg\" width=300 height=74 ></h1>",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "watch": "parcel watch --public-url . ./assets/assets.tsx --no-hmr",
+    "pluto": "julia -i start.jl"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fonsp/Pluto.jl.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fonsp/Pluto.jl/issues"
+  },
+  "homepage": "https://github.com/fonsp/Pluto.jl#readme",
+  "dependencies": {
+    "parcel": "^1.12.4",
+    "typescript": "^3.9.3"
+  }
+}
