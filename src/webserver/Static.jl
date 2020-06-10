@@ -43,7 +43,7 @@ const PLUTOROUTER = HTTP.Router()
 
 function notebook_redirect(notebook)
     response = HTTP.Response(302, "")
-    push!(response.headers, "Location" => ENV["PLUTO_ROOT_URL"] * "edit?uuid=" * string(notebook.uuid))
+    push!(response.headers, "Location" => ENV["PLUTO_ROOT_URL"] * "edit?id=" * string(notebook.notebook_id))
     return response
 end
 
@@ -54,7 +54,7 @@ function serve_sample(req::HTTP.Request)
         nb = load_notebook_nobackup(joinpath(PKG_ROOT_DIR, "sample", path))
         nb.path = tempname() * ".jl"
         save_notebook(nb)
-        notebooks[nb.uuid] = nb
+        notebooks[nb.notebook_id] = nb
         if ENV["PLUTO_RUN_NOTEBOOK_ON_LOAD"] == "true"
             run_reactive_async!(nb, nb.cells)
         end
@@ -80,7 +80,7 @@ function serve_openfile(req::HTTP.Request)
                 end
 
                 nb = load_notebook(path)
-                notebooks[nb.uuid] = nb
+                notebooks[nb.notebook_id] = nb
                 if ENV["PLUTO_RUN_NOTEBOOK_ON_LOAD"] == "true"
                     run_reactive_async!(nb, nb.cells) # TODO: send message when initial run completed
                 end
@@ -99,7 +99,7 @@ end
 function serve_newfile(req::HTTP.Request)
     nb = emptynotebook()
     save_notebook(nb)
-    notebooks[nb.uuid] = nb
+    notebooks[nb.notebook_id] = nb
     if ENV["PLUTO_RUN_NOTEBOOK_ON_LOAD"] == "true"
         run_reactive_async!(nb, nb.cells)
     end
