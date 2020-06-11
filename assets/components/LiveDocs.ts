@@ -1,13 +1,28 @@
 import { html } from "../common/Html.js"
-import { Component } from "https://unpkg.com/preact@10.4.4?module"
+import React from "react";
 
 import { cl } from "../common/ClassTable.js"
 
 import observablehq from "../common/SetupCellEnvironment.js"
 
-export class LiveDocs extends Component {
-    constructor() {
-        super()
+interface Props {
+    desired_doc_query: any;
+    client: any;
+}
+
+interface State {
+    shown_query: any;
+    searched_query: any;
+    body: any;
+    hidden: boolean;
+    loading: boolean;
+}
+
+export class LiveDocs extends React.Component<Props, State> {
+    updateDocTimer: any;
+
+    constructor(props: Props) {
+        super(props);
         this.state = {
             shown_query: null,
             searched_query: null,

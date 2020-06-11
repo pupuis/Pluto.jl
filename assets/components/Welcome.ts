@@ -1,5 +1,5 @@
 import { html } from "../common/Html.js"
-import { Component } from "https://unpkg.com/preact@10.4.4?module"
+import React from "react";
 
 import { FilePicker } from "./FilePicker.js"
 import { PlutoConnection } from "../common/PlutoConnection.js"
@@ -18,9 +18,22 @@ const shortpath = (path) => path.split("/").pop().split("\\").pop()
 export const link_open = ({ path }) => "open?path=" + encodeURIComponent(path)
 export const link_edit = ({ notebook_id }) => "edit?id=" + notebook_id
 
-export class Welcome extends Component {
-    constructor() {
-        super()
+interface Props {
+
+}
+
+interface State {
+    combined_notebooks: any;
+    connected: boolean;
+}
+
+export class Welcome extends React.Component<Props, State> {
+    client: any;
+    on_open_path: (new_path) => void;
+    on_session_click: (nb) => void;
+
+    constructor(props: Props) {
+        super(props);
 
         this.state = {
             // running_notebooks: null,

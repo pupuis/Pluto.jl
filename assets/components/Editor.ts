@@ -1,5 +1,5 @@
 import { html } from "../common/Html.js"
-import { Component } from "https://unpkg.com/preact@10.4.4?module"
+import React from "react";
 
 import { PlutoConnection } from "../common/PlutoConnection.js"
 import { create_counter_statistics, send_statistics_if_enabled, store_statistics_sample, finalize_statistics, init_feedback } from "../common/Feedback.js"
@@ -12,9 +12,41 @@ import { DropRuler } from "./DropRuler.js"
 import { link_open } from "./Welcome.js"
 import { empty_cell_data, code_differs } from "./Cell.js"
 
-export class Editor extends Component {
-    constructor() {
-        super()
+export interface Cell {
+    cell_id: number;
+    running: boolean;
+    local_code: any;
+}
+
+export interface Notebook {
+    path: string;
+    notebook_id: string;
+    cells: Cell[];
+}
+
+interface Props {
+    path: string;
+}
+
+interface State {
+    notebook: Notebook;
+    desired_doc_query: any;
+    connected: boolean;
+    loading: boolean;
+    path: any;
+}
+
+export class Editor extends React.Component<Props, State> {
+    set_cell_state: any;
+    all_completed: boolean;
+    all_completed_promise: any;
+    counter_statistics: any;
+    client: any;
+    requests: any;
+    submit_file_change: (new_path, reset_cm_value) => void;
+
+    constructor(props: Props) {
+        super(props);
 
         this.state = {
             notebook: {

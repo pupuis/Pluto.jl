@@ -1,11 +1,26 @@
 import { html } from "../common/Html.js"
-import { Component } from "https://unpkg.com/preact@10.4.4?module"
+import React from "react";
 
 import { utf8index_to_ut16index } from "../common/UnicodeTools.js"
 
-export class FilePicker extends Component {
-    constructor() {
-        super()
+interface Props {
+    value: any;
+    button_label: any;
+    on_submit: (value, callback) => void;
+}
+
+interface State {
+    // nothing yet
+}
+
+export class FilePicker extends React.Component<Props, State> {
+    forced_value: string;
+    cm: any;
+    base: any;
+    on_submit: () => void;
+
+    constructor(props: Props) {
+        super(props);
         this.forced_value = ""
         this.cm = null
 

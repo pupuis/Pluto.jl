@@ -1,5 +1,5 @@
 import { html } from "../common/Html.js"
-import { Component } from "https://unpkg.com/preact@10.4.4?module"
+import React from "react";
 
 import { ErrorMessage } from "./ErrorMessage.js"
 
@@ -8,9 +8,22 @@ import { connect_bonds } from "../common/Bond.js"
 import "../common/SetupCellEnvironment.js"
 import "../treeview.js"
 
-export class CellOutput extends Component {
-    constructor() {
-        super()
+interface Props {
+    rootassignee: any;
+    timestamp: number;
+}
+
+interface State {
+    // nothing yet
+}
+
+export class CellOutput extends React.Component<Props, State> {
+    displayed_timestamp: number;
+    old_height: number;
+    base: any;
+
+    constructor(props: Props) {
+        super(props);
         this.displayed_timestamp = 0
     }
 
@@ -77,7 +90,19 @@ const OutputBody = ({ mime, body, cell_id, all_completed_promise, requests }) =>
     }
 }
 
-export class RawHTMLContainer extends Component {
+interface Props2 {
+    body: any;
+    all_completed_promise: any;
+    requests: any;
+}
+
+interface State2 {
+    // nothing yet
+}
+
+export class RawHTMLContainer extends React.Component<Props2, State2> {
+    base: any;
+
     render_DOM() {
         this.base.innerHTML = this.props.body
 

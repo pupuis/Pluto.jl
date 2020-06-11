@@ -1,9 +1,24 @@
 import { html } from "../common/Html.js"
-import { Component } from "https://unpkg.com/preact@10.4.4?module"
+import React from "react";
 
-export class DropRuler extends Component {
-    constructor() {
-        super()
+interface Props {
+    requests: any;
+}
+
+interface State {
+    dragging: any;
+    dropIndex: any;
+}
+
+export class DropRuler extends React.Component<Props, State> {
+    elementRef: any;
+    dropee: any;
+    dropPositions: any;
+    getDropIndexOf: (pageY) => void;
+    base: any;
+
+    constructor(props: Props) {
+        super(props);
         this.elementRef = null
         this.dropee = null
         this.dropPositions = []
