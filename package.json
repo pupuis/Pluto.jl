@@ -21,7 +21,11 @@
   },
   "homepage": "https://github.com/fonsp/Pluto.jl#readme",
   "dependencies": {
+    "@types/react": "^16.9.36",
+    "htm": "^3.0.4",
     "parcel": "^1.12.4",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
     "typescript": "^3.9.3"
   }
 }

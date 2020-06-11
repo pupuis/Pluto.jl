@@ -1,11 +1,34 @@
-import { html } from "../common/Html.js"
-import { render, Component } from "https://unpkg.com/preact@10.4.4?module"
+import React from "react";
+import { html } from "../common/Html.js";
+//import { render, Component } from "https://unpkg.com/preact@10.4.4?module"
 
 import { utf8index_to_ut16index } from "../common/UnicodeTools.js"
 
-export class CellInput extends Component {
-    constructor() {
-        super()
+interface Props {
+    cell_id: any;
+    client: any;
+    create_focus: any;
+    disable_input: any;
+    remote_code: any;
+    on_add_after: () => void;
+    on_change: (value) => void;
+    on_delete: () => void;
+    on_submit: (value) => void;
+    on_update_doc_query: (tokenstring) => void;
+}
+
+interface State {
+    // nothing yet
+}
+
+export class CellInput extends React.Component<Props, State> {
+    displayed_timestamp: number;
+    cm: any;
+    base: any;
+    focusListener: any;
+
+    constructor(props: Props) {
+        super(props);
         this.displayed_timestamp = 0
     }
 
