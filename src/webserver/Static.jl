@@ -125,5 +125,16 @@ function http_router_for(session::ServerSession)
     end
     HTTP.@register(router, "GET", "/*", serve_asset)
 
+    function serve_cookie(req::HTTP.Request)
+        @show req
+        @show HTTP.Cookies.cookies(req)
+        
+        res = HTTP.Response(200, "Hello! $(req)")
+        push!(res.headers, "Set-Cookie" => "token=abacadabra; SameSite=Lax; HttpOnly")
+        return res
+    end
+
+    HTTP.@register(router, "GET", "/cookie", serve_cookie)
+
     return router
 end

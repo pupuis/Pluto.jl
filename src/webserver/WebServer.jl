@@ -131,7 +131,7 @@ The default `host` is `"127.0.0.1"`. For wild setups like Docker and heroku, you
 
 This will start the static HTTP server and a WebSocket server. The server runs _synchronously_ (i.e. blocking call) on `http://[host]:[port]/`. Pluto notebooks can be started from the main menu in the web browser.
 """
-function run(host, port::Union{Missing, Integer}; launchbrowser::Bool=false, session=ServerSession())
+function run(host, port::Union{Missing,Integer}; launchbrowser::Bool=false, session=ServerSession())
     pluto_router = http_router_for(session)
 
     hostIP = parse(Sockets.IPAddr, host)
@@ -150,6 +150,9 @@ function run(host, port::Union{Missing, Integer}; launchbrowser::Bool=false, ses
         # messy messy code so that we can use the websocket on the same port as the HTTP server
 
         if HTTP.WebSockets.is_upgrade(http.message)
+            cookies = HTTP.Cookies.cookies(http.message)
+            
+
             try
                 requestURI = http.message.target |> HTTP.URIs.unescapeuri |> HTTP.URI
                 @assert endswith(requestURI.path, string(session.secret))
@@ -274,7 +277,7 @@ function run(host, port::Union{Missing, Integer}; launchbrowser::Bool=false, ses
     end
 end
 
-run(port::Union{Missing, Integer}=missing; kwargs...) = run("127.0.0.1", port; kwargs...)
+run(port::Union{Missing,Integer}=missing; kwargs...) = run("127.0.0.1", port; kwargs...)
 
 "All messages sent over the WebSocket get decoded+deserialized and end up here."
 function process_ws_message(session::ServerSession, parentbody::Dict, clientstream::IO)
