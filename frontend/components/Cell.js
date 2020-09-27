@@ -13,7 +13,6 @@ const observeViewport = () => {
   useEffect(() => {
     let observer = new IntersectionObserver((entries, observer) => {
       set_cell_in_viewport(entries[0].isIntersecting)
-      //console.log(entries[0].isIntersecting)
     }, {})
 
     observer.observe(cellReference.current)
@@ -133,7 +132,6 @@ export const Cell = ({
     const class_code_folded = code_folded && cm_forced_focus == null
 
     return html`
-        <div ref=${cellReference}>
         <pluto-cell
             class=${cl({
                 queued: queued,
@@ -169,6 +167,7 @@ export const Cell = ({
                 <span></span>
             </button>
             <${CellOutput} ...${output} all_completed_promise=${all_completed_promise} requests=${requests} cell_id=${cell_id} />
+            <div ref=${cellReference}>
             <${CellInput}
                 is_hidden=${!errored && !class_code_folded && class_code_folded && !cell_in_viewport}
                 local_code=${local_code}
@@ -200,6 +199,7 @@ export const Cell = ({
                 cell_id=${cell_id}
                 notebook_id=${notebook_id}
             />
+            </div>
             <${RunArea}
                 onClick=${() => {
                     if (running || queued) {
@@ -226,6 +226,5 @@ export const Cell = ({
                 <span></span>
             </button>
         </pluto-cell>
-        </div>
     `
 }
