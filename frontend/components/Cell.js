@@ -128,6 +128,7 @@ export const Cell = ({
     }, [])
 
     const { cellReference, cell_in_viewport } = observeViewport()
+    
 
     const class_code_differs = remote_code.body !== local_code.body
     const class_code_folded = code_folded && cm_forced_focus == null
