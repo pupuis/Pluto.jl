@@ -154,8 +154,8 @@ export const Cell = ({
                 <span></span>
             </button>
             <${CellOutput} ...${output} all_completed_promise=${all_completed_promise} requests=${requests} cell_id=${cell_id} />
-            ${show_input &&
-            html`<${CellInput}
+            <${CellInput}
+                is_hidden=${!errored && !class_code_folded && class_code_folded}
                 local_code=${local_code}
                 remote_code=${remote_code}
                 disable_input=${disable_input}

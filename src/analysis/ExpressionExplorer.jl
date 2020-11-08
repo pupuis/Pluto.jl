@@ -108,7 +108,7 @@ function union!(a::ScopeState, bs::ScopeState...)
 end
 
 function ==(a::SymbolsState, b::SymbolsState)
-    a.references == b.references && a.assignments == b.assignments && a.funccalls == b.funccalls && a.funcdefs == b.funcdefs 
+    a.references == b.references && a.assignments == b.assignments && a.funccalls == b.funccalls && a.funcdefs == b.funcdefs
 end
 
 Base.push!(x::Set) = x
@@ -244,7 +244,7 @@ function without_dotsuffix(funcname::Symbol)::Symbol
         funcname
     end
 end
-        
+
 """Turn `Symbol[:Module, :func]` into Symbol("Module.func").
 
 This is **not** the same as the expression `:(Module.func)`, but is used to identify the function name using a single `Symbol` (like normal variables).
@@ -264,7 +264,7 @@ end
 # Like: a = 1
 # 1 is a value (Int64)
 function explore!(value, scopestate::ScopeState)::SymbolsState
-    # includes: LineNumberNode, Int64, String, 
+    # includes: LineNumberNode, Int64, String,
     return SymbolsState()
 end
 
@@ -286,7 +286,7 @@ end
 function explore!(ex::Expr, scopestate::ScopeState)::SymbolsState
     if ex.head == :(=)
         # Does not create scope
-        
+
         if ex.args[1] isa Expr && (ex.args[1].head == :call || ex.args[1].head == :where || (ex.args[1].head == :(::) && ex.args[1].args[1] isa Expr && ex.args[1].args[1].head == :call))
             # f(x, y) = x + y
             # Rewrite to:
@@ -309,7 +309,7 @@ function explore!(ex::Expr, scopestate::ScopeState)::SymbolsState
         # If we are _not_ assigning a global variable, then this symbol hides any global definition with that name
         push!(scopestate.hiddenglobals, setdiff(assignees, global_assignees)...)
         assigneesymstate = explore!(ex.args[1], scopestate)
-        
+
         push!(scopestate.hiddenglobals, global_assignees...)
         push!(symstate.assignments, global_assignees...)
         push!(symstate.references, setdiff(assigneesymstate.references, global_assignees)...)
@@ -347,7 +347,7 @@ function explore!(ex::Expr, scopestate::ScopeState)::SymbolsState
         return explore!(Expr(:for, ex.args[2:end]..., ex.args[1]), scopestate)
     elseif ex.head == :macrocall
         # Does not create sccope
-        
+
         funcname = ex.args[1] |> split_funcname
         # Macros can transform the expression into anything - the best way to treat them is to macroexpand
         # the problem is that the macro is only available on the worker process, see https://github.com/fonsp/Pluto.jl/issues/196
@@ -357,12 +357,12 @@ function explore!(ex::Expr, scopestate::ScopeState)::SymbolsState
                 expanded = macroexpand(PlutoRunner, ex; recursive=false)
                 return explore!(Expr(:call, ex.args[1], expanded), scopestate)
             elseif funcname[end] == Symbol("@enum")
-                # we could do macroexpand, but the expanded macro defines typemin and typemax methods for the new enum type, and because of 
+                # we could do macroexpand, but the expanded macro defines typemin and typemax methods for the new enum type, and because of
                 # https://github.com/fonsp/Pluto.jl/issues/177
                 # this would mean that you can only define one enum per notebook :(
                 syms = filter(x -> x isa Symbol, ex.args[2:end])
                 rest = setdiff(ex.args[2:end], syms)
-                
+
                 return mapfoldl(a -> explore!(a, scopestate), union!, rest, init=SymbolsState(assignments=Set{Symbol}(syms), funccalls=Set{FunctionName}([[Symbol("@enum")]])))
             end
         end
@@ -437,7 +437,7 @@ function explore!(ex::Expr, scopestate::ScopeState)::SymbolsState
         end
 
         union!(innersymstate, explore!(Expr(:block, ex.args[2:end]...), innerscopestate))
-        
+
         funcnamesig = FunctionNameSignaturePair(funcname, canonalize(funcroot))
 
         if will_assign_global(funcname, scopestate)
@@ -450,7 +450,7 @@ function explore!(ex::Expr, scopestate::ScopeState)::SymbolsState
             end
         else
             # The function is not defined globally. However, the function can still modify the global scope or reference globals, e.g.
-            
+
             # let
             #     function f(x)
             #         global z = x + a
@@ -529,7 +529,7 @@ function explore!(ex::Expr, scopestate::ScopeState)::SymbolsState
             @error "unknown global use" ex
             return explore!(globalisee, scopestate)
         end
-        
+
         return symstate
     elseif ex.head == :local
         # Does not create scope
@@ -548,11 +548,11 @@ function explore!(ex::Expr, scopestate::ScopeState)::SymbolsState
         end
     elseif ex.head == :tuple
         # Does not create scope
-        
+
         # There are three (legal) cases:
         # 1. Creating a tuple:
         #   (a, b, c)
-        
+
         # 2. Creating a named tuple:
         #   (a=1, b=2, c=3)
 
@@ -561,7 +561,7 @@ function explore!(ex::Expr, scopestate::ScopeState)::SymbolsState
         # This parses to:
         # head = :tuple
         # args = [:a, :b, :(c=1), :2, :3]
-        # 
+        #
         # 🤔
         # we turn it into two expressions:
         #
@@ -583,7 +583,7 @@ function explore!(ex::Expr, scopestate::ScopeState)::SymbolsState
                 end
                 return explore!(Expr(:block, new_args...), scopestate)
             else
-                # 3. 
+                # 3.
                 # we have a tuple assignment, e.g. `a, (b, c) = [1, [2, 3]]`
                 before = ex.args[1:indexoffirstassignment - 1]
                 after = ex.args[indexoffirstassignment + 1:end]
@@ -629,7 +629,7 @@ function explore!(ex::Expr, scopestate::ScopeState)::SymbolsState
         # fallback, includes:
         # begin, block, do, toplevel, const
         # (and hopefully much more!)
-        
+
         # Does not create scope (probably)
 
         return mapfoldl(a -> explore!(a, scopestate), union!, ex.args, init=SymbolsState())
@@ -653,7 +653,7 @@ function explore_funcdef!(ex::Expr, scopestate::ScopeState)::Tuple{FunctionName,
 
             return Symbol[], symstate
         end
-        
+
         # recurse
         name, symstate = explore_funcdef!(ex.args[1], scopestate)
         if length(ex.args) > 1
@@ -737,7 +737,7 @@ julia> f(x) = 2
 f (generic function with 1 method)
 ``
 
-After adding the second method, the function still has only 1 method. This is because the second definition overrides the first one, instead of being added to the method table. This example should be illegal in Julia, for the same reason that `f = 1` and `f = 2` is illegal. So our problem is: how do we know that two cells will define overlapping methods? 
+After adding the second method, the function still has only 1 method. This is because the second definition overrides the first one, instead of being added to the method table. This example should be illegal in Julia, for the same reason that `f = 1` and `f = 2` is illegal. So our problem is: how do we know that two cells will define overlapping methods?
 
 Ideally, we would just evaluate the user's code and **count methods** afterwards, letting Julia do the work. Unfortunately, we need to know this info _before_ we run cells, otherwise we don't know in which order to run a notebook! There are ways to break this circle, but it would complicate our process quite a bit.
 
@@ -779,8 +779,8 @@ _(More precisely, evaluating `Expr(:function, x, Expr(:block))` with `x ∈ {a, 
 
 The equivalence sets are isomorphic to the set of possible Julia methods.
 
-Instead of finding a closed form algorithm for `~`, we search for a _canonical form_: a function `canonical: H -> H` that chooses one canonical expression per equivalence class. It has the property 
-    
+Instead of finding a closed form algorithm for `~`, we search for a _canonical form_: a function `canonical: H -> H` that chooses one canonical expression per equivalence class. It has the property
+
 `canonical(a) = canonical(b)` implies `a ~ b`.
 
 We use this **canonical form** of the function's definition expression as its "signature". We compare these canonical forms when determining whether two function expressions will result in overlapping methods.
@@ -816,7 +816,7 @@ function canonalize(ex::Expr)
 		interesting = filter(ex.args[2:end]) do arg
 			!(arg isa Expr && arg.head == :parameters)
 		end
-		
+
 		hide_argument_name.(interesting)
     elseif ex.head == :(::)
         canonalize(ex.args[1])
@@ -857,7 +857,7 @@ function compute_symbolreferences(ex::Any)::SymbolsState
     # We do something special to account for recursive functions:
     # If a function `f` calls a function `g`, and both are defined inside this cell, the reference to `g` inside the symstate of `f` will be deleted.
     # The motivitation is that normally, an assignment (or function definition) will add that symbol to a list of 'hidden globals' - any future references to that symbol will be ignored. i.e. the _local definition hides a global_.
-    # In the case of functions, you can reference functions and variables that do not yet exist, and so they won't be in the list of hidden symbols when the function definition is analysed. 
+    # In the case of functions, you can reference functions and variables that do not yet exist, and so they won't be in the list of hidden symbols when the function definition is analysed.
     # Of course, our method will fail if a referenced function is defined both inside the cell **and** in another cell. However, this will lead to a MultipleDefinitionError before anything bad happens.
     for (func, inner_symstate) in symstate.funcdefs
         inner_symstate.references = setdiff(inner_symstate.references, keys(symstate.funcdefs))
